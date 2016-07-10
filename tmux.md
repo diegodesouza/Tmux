@@ -18,13 +18,24 @@ and then press d"
 
 ## Basics
 
+| Abrv   | Full Name     |
+| -------|---------------|
+| new    | new-session   |
+| -s     | session       |
+| -t     | target        |
+| a / at | attach        |
+| ls     | list sessions |
+| -h     | horizontal    |
+| -v     | vertical      |
+
+
 #### Creating Named Sessions
 
-`$ tmux new -s <name_of_session>`
+`$ tmux new -s [name_of_session]`
 
 #### Attaching From Sessions
  
- `$ tmux attach -t <name_of_existing_session>`
+ `$ tmux attach -t [name_of_existing_session]`
 
 #### Detaching From Sessions
 
@@ -35,13 +46,13 @@ meaning you can still re-attach to it later.*
 
 #### Killing Sessions
 
-`$ tmux kill-session -t <name_of_session>`
+`$ tmux kill-session -t [name_of_session]`
 
 ## Window Management (Tabs)
 
 #### Creating and naming a window with a new session
 
- `$ tmux new -s <name_of_session> -n <name_of_window>`
+ `$ tmux new -s [name_of_session] -n [name_of_window]`
 
   * The `-n` flag tells tmux to name the first window whatever you pass in the `name_of_window`.
 
@@ -57,13 +68,13 @@ NOTE: You can then rename your newly created window by using *`PREFIX` `,`*
   
   then in the prompt we should be able to enter
   
-  `new-window -n <name_of_window>`
+  `new-window -n [name_of_window]`
   
    * Except that this is rather verbose and long to create a named window (tab).
 
 #### Switching Windows
 
-`PREFIX` `<1..9>`
+`PREFIX` `[1..9]`
 
 #### Displaying a list of windows
 
