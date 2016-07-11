@@ -27,7 +27,7 @@ and then press d"
 | ls     | list sessions |
 | -h     | horizontal    |
 | -v     | vertical      |
-
+| -d     | detach        |
 
 #### Creating Named Sessions
 
@@ -109,3 +109,46 @@ NOTE: You can then rename your newly created window by using *`PREFIX` `,`*
 * Reloads .tmux.conf
 
 `PREFIX` `r`
+
+## Creating Custom Scripts
+
+* Based on the knowledge we have above, we can start a script with some tmux commands.
+Let's create a file called `~/development`. 
+  * `touch ~/development`
+  
+  In it we start with:
+  
+  `tmux new-session -s development -n editor -d`
+  
+  * **Recap**: we're creating a new named session called `development` a new *window* called `editor` and immediatedly detaching from this new session with the `-d` flag.
+  
+  
+  * In Tmux we can send commands to other sessions with `send-keys`. This is going to come handy when running script like the ones we're creating. Here's an example.
+
+  Ex: `tmux send-keys -t development 'cd ~/devproject' C-m` - cd into devproject directory.
+  
+  Ex: `tmux send-keys -t development 'vim' C-m` - opens vim editor.
+  
+  **NOTE**: `C-m` is equivalent to pressing `ENTER`. Notice how the commands `cd ~/devproject` and `vim` are in quotes as well.  
+  
+  Ex: `tmux split-window -v -t development` - splits a window vertically.
+  
+  Ex: `tmux split-window -v development main-horizontal` - splits the main window horizontally.
+  
+  * We can target another window as well with this formatting. `[session]:[window].[pane]`.
+  
+  Ex: `tmux send-keys -t development:1.2 'cd ~/devproject' C-m` cd into devproject directory in sesson 1 window 2.
+  
+The script looks like something like this, with extra stuff. The sky is the limit here. 
+
+```tmux new-session -s development -n editor -d
+tmux send-keys -t development 'cd ~/devproject' C-m
+tmux send-keys -t development 'vim' C-m
+tmux split-window -v -t development
+tmux select-layout -t development main-horizontal
+tmux send-keys -t development:1.2 'cd ~/devproject' C-m
+tmux new-window -n console -t development
+tmux send-keys -t development:2 'cd ~/devproject' C-m
+tmux select-window -t development:1
+tmux attach -t development
+```
