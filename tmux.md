@@ -141,7 +141,8 @@ Let's create a file called `~/development`.
   
 The script looks like something like this, with extra stuff. The sky is the limit here. 
 
-```tmux new-session -s development -n editor -d
+```
+tmux new-session -s development -n editor -d
 tmux send-keys -t development 'cd ~/devproject' C-m
 tmux send-keys -t development 'vim' C-m
 tmux split-window -v -t development
