@@ -4,12 +4,11 @@
 
 To keep it simple, we'll follow these conventions.
 
-* `PREFIX` means the default `CTRL-b` here, though I have remapped my `PREFIX` to `CTRL-s` because it's better find it better to reach (also because most of my colleagues already use these key bidings). I hear some people have mapped their `Caps-lock-a` as their `PREFIX`. Use your discretion here. There are no rules. 
+* `PREFIX` means the default `CTRL-b` here, though I have remapped my `PREFIX` to `CTRL-s` because I find it better to reach (also because most of my colleagues already use these key bindings). I hear some people have mapped their `Caps-lock-a` as their `PREFIX`. Use your discretion here. There are no rules. 
 
 * `CTRL-s` means "press the CTRL and s keys simultaneously"
 
-* `CTRL-R` means the same thing, except that you'll need to use
-the `SHIFT` key to produce the capital "R". Just notice the capital letters.
+* `CTRL-R` means the same thing, except that you'll need to use the `SHIFT` key to produce the capital "R". Just notice the capital letters.
 
 * `CTRL-s d` means "press the CTRL and s keys simultaneously, then release,
 and then press d"
@@ -41,7 +40,7 @@ and then press d"
 
 * `CTRL-s` `d`, or
 * `PREFIX` `d`
-  * NOTE: *The session you just dettached from, is still running in the background,
+  * NOTE: *The session you just detached from, is still running in the background,
 meaning you can still re-attach to it later.*
 
 #### Killing Sessions
@@ -84,7 +83,7 @@ NOTE: You can then rename your newly created window by using *`PREFIX` `,`*
 
 `PREFIX` `&`
 
-#### Spliting windows
+#### Splitting windows
 
   * Horizontally (will stack one pane on top of each other)
   
@@ -93,6 +92,31 @@ NOTE: You can then rename your newly created window by using *`PREFIX` `,`*
   * Vertically (will put one pane next to each other)
   
   `PREFIX` `\`
+  
+  NOTE: when we split afollowed window, it is said we have created a *pane*. 
+
+#### Turning a Pane into a Window
+
+  * After splitting a window you might want to have a specific pane as a window instead.
+
+  `PREFIX` `!`
+
+#### Turning a Window into a Pane
+
+  * To reverse the above, we need to do a little bit of work. Essentially we'll be moving a pane from one session to another. We specify the source window and pane, followed by the target window and pane. If we leave the target off, the current focused window becomes the target.
+
+  Ex: We create a new Tmux session with two windows.
+  
+  ```
+  $ tmux new-session -s panes -n first -d
+  $ tmux new-window -t panes -n second
+  $ tmux attach -t panes
+  ```
+
+  Now, to move the first window into a pane in the second window, we press
+`PREFIX` `:` to enter Command mode, and type this:
+`join-pane -s 1`
+This means “Take window 1 and join it to the current window,” since we didn’t specify a target.
 
 #### Resizing split windows
 
@@ -104,7 +128,8 @@ NOTE: You can then rename your newly created window by using *`PREFIX` `,`*
  
    `CTRL-LEFT` `CTRL-RIGHT` `CTRL-UP` `CTRL-DOWN`
 
-## Settings
+# Settings
+-
 
 * Reloads .tmux.conf
 
@@ -112,7 +137,7 @@ NOTE: You can then rename your newly created window by using *`PREFIX` `,`*
 
 ## Creating Custom Scripts
 
-* Based on the knowledge we have above, we can start a script with some tmux commands.
+* Based on the knowledge we have above, we can start a script with some tux commands.
 Let's create a file called `~/development`. 
   * `touch ~/development`
   
@@ -120,7 +145,7 @@ Let's create a file called `~/development`.
   
   `tmux new-session -s development -n editor -d`
   
-  * **Recap**: we're creating a new named session called `development` a new *window* called `editor` and immediatedly detaching from this new session with the `-d` flag.
+  * **Recap**: we're creating a new named session called `development` a new *window* called `editor` and immediately detaching from this new session with the `-d` flag.
   
   
   * In Tmux we can send commands to other sessions with `send-keys`. This is going to come handy when running script like the ones we're creating. Here's an example.
@@ -137,7 +162,7 @@ Let's create a file called `~/development`.
   
   * We can target another window as well with this formatting. `[session]:[window].[pane]`.
   
-  Ex: `tmux send-keys -t development:1.2 'cd ~/devproject' C-m` cd into devproject directory in sesson 1 window 2.
+  Ex: `tmux send-keys -t development:1.2 'cd ~/devproject' C-m` cd into devproject directory in session 1 window 2.
   
 The script looks like something like this, with extra stuff. The sky is the limit here. 
 
@@ -153,3 +178,67 @@ tmux send-keys -t development:2 'cd ~/devproject' C-m
 tmux select-window -t development:1
 tmux attach -t development
 ```
+
+# Copy Mode 
+-
+
+* In order to be able to copy text in Tmux we need to enter *copy mode*. 
+
+`PREFIX` `[` puts us in that mode. Though out of the box the commands aren't very intuitive. So after a little googling, I got it working the *vim* way. 
+
+In my `.tmux.conf` file, i placed the following settings. 
+
+```
+# Use vim keybindings in copy mode
+setw -g mode-keys vi
+
+# Setup 'v' to begin selection as in Vim
+bind-key -t vi-copy v begin-selection
+bind-key -t vi-copy y copy-pipe "reattach-to-user-namespace pbcopy"
+
+# Update default binding of `Enter` to also use copy-pipe
+unbind -t vi-copy Enter
+bind-key -t vi-copy Enter copy-pipe "reattach-to-user-namespace pbcopy"
+```
+and in my `.vimrc` I added 
+
+
+```
+" be able to copy from vim within tmux
+set clipboard=unnamed
+```
+
+I encourage you to google these settings and dig deeper as the information is so beyond my needs at the moment.
+
+
+# Buffers
+-
+
+
+* Displays the content of our paste buffer.
+
+`$ tmux show-buffer`
+
+* Displays a list of buffers we have used.
+
+`$ tmux list-buffers`
+
+* Saves buffer into a file
+
+`$ tmux capture-pane && tmux save-buffer buffer.txt`
+
+* Choose a buffer from a list
+
+`$ tmux choose-buffer`
+
+* Scrolls up one page
+
+`Ctrl-b`
+
+* Scrolls down one page
+
+`Ctrl-f`
+
+* Inherits some *Vim* commands like `/`, `?`, `g`, `G`, `f`, `F`, etc...
+
+NOTE: although there are a lot more you can do with buffers, this is as far as I've gotten to using them. Feel free to dig deeper. 
